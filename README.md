@@ -8,3 +8,9 @@ npm i dcb -g
 ...or...
 yarn add --global dcb 
 ```
+
+### Usage
+
+```bash
+dc help
+```
