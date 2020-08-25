@@ -1,0 +1,29 @@
+const { preGet } = require('../actions/pre-get');
+const { log, ask } = require("../actions/console");
+
+const chalk = require("chalk")
+const { resolve } = require("path");
+const fs = require("fs");
+
+const get = async (tag, manifestOverride) => {
+    const home = require('os').homedir();
+    const cache = resolve(home, ".cache");
+
+    try { fs.mkdirSync(resolve(cache)) } catch(e) {}
+    try { fs.mkdirSync(resolve(cache, "dot")) } catch(e) {}
+
+    if(fs.existsSync(resolve(cache, "dot", tag))) return preGet(tag, manifestOverride);
+
+    const trust = await ask(`${chalk.blue.bold("QUESTION")} Do you trust the build script \`${tag} (https://raw.githubusercontent.com/${manifestOverride ? manifestOverride : "dothq/dot"}/master/manifests/${tag}.json)\`? ${chalk.white.bold('[yes/no]')} `);
+
+    if(trust.toLowerCase() == "yes" || trust.toLowerCase() == "y") {
+      log("INFO", `Saving trust setting to \`${resolve(cache, "dot", tag)}\`...`)
+
+      return preGet(tag, manifestOverride)
+    } else {
+      log("INFO", `Exiting...`)
+      process.exit(0)
+    }
+}
+
+module.exports = { get }
