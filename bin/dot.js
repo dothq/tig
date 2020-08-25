@@ -7,6 +7,7 @@ const fs = require("fs");
 const http = require('isomorphic-git/http/node')
 const path = require("path");
 const axios = require('axios');
+const readline = require("readline");
 
 const commandExists = require('command-exists').sync;
 
@@ -15,6 +16,11 @@ const hg = require("hg");
 const { exec } = require('child_process');
 
 program.version('1.0.0');
+
+const rlInterface = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
 const log = (chan, pl, upPrev, nl) => {
     const channels = {
@@ -62,27 +68,72 @@ const runShell = (cmd) => {
   });
 }
 
+const downloadManifest = (repo, name) => {
+  return new Promise((resolve, reject) => {
+    axios.get(`https://raw.githubusercontent.com/${repo ? repo : "dothq/dot"}/master/manifests/${name}.json`)
+      .then(res => resolve(res.data))
+  })
+}
+
+const ask = (q) => {
+  return new Promise((resolve, reject) => {
+    rlInterface.question(q, (a) => {
+      rlInterface.close();
+      resolve(a)
+    });
+  })
+}
+
 program
-  .command('get <tag>')
+  .command('get <tag> [manifestOverride]')
   .description('get a project by its tag name')
-  .action((tag) => {
+  .action(async (tag, manifestOverride) => {
+    log("PROCESS", `Downloading \`${tag}\` manifest...`)
 
+    const manifest = await downloadManifest(manifestOverride, tag);
 
+    log("SUCCESS", `Downloaded \`${tag}\` manifest.`)
+
+    const { name, id, author } = manifest;
+
+    if(!name || !id || !author) { 
+      log("ERROR", `Failed to load build script \`${tag}\`. It seems to be malformed.`)
+      process.exit(-1)
+    }
+
+    const trust = await ask(`${chalk.blue.bold("QUESTION")} Do you trust the build script \`${name}\` created by \`${author}\`? ${chalk.white.bold('[yes/no]')} `);
+
+    console.log(trust)
+
+    log("INFO", `Setting up \`${name} (${id})\`.`)
   });
 
 program
   .command('tags [manifestOverride]')
   .description('lists all tags')
   .action((manifestOverride) => {
-    log("INFO", `Fetching manifests from \`https://api.github.com/repos/${manifestOverride ? manifestOverride : "dothq/dot"}/contents/manifests\`.`)
+    var t = Date.now();
+
+    log("INFO", `Fetching manifests from \`https://api.github.com/repos/${manifestOverride ? manifestOverride : "dothq/dot"}/contents/manifests\`...`, true)
 
     axios.get(`https://api.github.com/repos/${manifestOverride ? manifestOverride : "dothq/dot"}/contents/manifests`)
       .then(res => {
-        console.log(res.json)
+        log("INFO", `Loaded \`${res.data.length}\` manifest${res.data.length == 1 ? "" : "s"} in \`${Date.now() - t}ms\``, true, true)
+
+
+        console.log("\n\n  Available manifests")
+
+        res.data.forEach(manifest => {
+          console.log(`   - ${manifest.name.split(".")[0]}`)
+        })
+
+        console.log("")
       }).catch(e => {
-        log("ERROR", `Failed ${JSON.stringify(e.response.data)}.`)
+        if(!e.response) return console.error("\n" + e)
+
+        log("ERROR", `Failed ${JSON.stringify(e.response.data)}.`, true)
         if(e.response.data.message == "Not Found") {
-          log("ERROR", "You could try adding a manifest override argument to |dot tags|.")
+          log("ERROR", "You could try adding a manifest override argument to |dot tags|.", false, true)
         }
       })
   });
