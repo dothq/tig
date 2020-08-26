@@ -3,7 +3,7 @@ const { resolve } = require("path");
 const chalk = require("chalk");
 
 const { grabManifest } = require("./download-manifest");
-const { runCppHook, buildCppHook } = require("./cpp-hook");
+const { runCppHook } = require("./cpp-hook");
 const { log } = require("./console");
 const rimraf = require("rimraf");
 const { fancyTime } = require("./time");
@@ -51,10 +51,6 @@ const preGet = async (tag, manifestOverride) => {
     log("INFO", `Setting up \`${name} (${id})\` by \`${author}\`.`)
   
     rimraf.sync(resolve(process.cwd(), tag))
-  
-    var t = Date.now();
-    await buildCppHook()
-    log("SUCCESS", `Built native C++ binary in \`${fancyTime(Date.now() - t)}s\`.\n`, true, false)
 
     for (const [targetName, targetData] of Object.entries(targets)) {
       const loc = resolve(process.cwd(), tag);
