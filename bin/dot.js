@@ -5,6 +5,7 @@ const axios = require('axios');
 
 const { get } = require('../commands/get');
 const { update } = require('../commands/update');
+const { merge } = require('../commands/merge');
 
 const { log } = require("../actions/console");
 
@@ -28,6 +29,11 @@ program
 	.command('update')
 	.description('clear the manifests cache if they are misbehaving')
 	.action(async () => update());
+
+program
+	.command('postget-merge <patch> <base>')
+	.description("don't run this command unless you know what you're doing")
+	.action(async (patch, base) => merge(patch, base));
 
 program
 	.command('tags [manifestOverride]')

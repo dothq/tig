@@ -39,7 +39,6 @@ const runCppHook = async (target, targetName, location) => {
         let child = exec(cmd, (err, stdout, stderr) => {
             if(err || stderr) {
                 console.log("\n" + (err || stderr))
-                return process.exit(0);
             }
         })
 

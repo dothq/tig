@@ -8,7 +8,8 @@ const { log } = require("./console");
 const rimraf = require("rimraf");
 const { fancyTime } = require("./time");
 const commandExists = require("command-exists");
-const merge = require('merge-dirs');
+const mergedirs = require('merge-dirs');
+const { spawn, exec } = require("child_process");
 
 const sleep = () => {
   return new Promise((resolve) => {
@@ -67,34 +68,34 @@ const preGet = async (tag, manifestOverride) => {
       else await runCppHook(targetData, targetName, loc);
     }
 
+    var patchesDone = 0;
+
     for (const patch of patches) {
-      console.log(patch)
+      const child = spawn(`node`, [resolve(__dirname, "../bin/dot.js"), "postget-merge", patch.folder, tag], {
+        cwd: process.cwd(),
+        detached: true,
+        stdio: "inherit"
+      })
 
-      const patchLocation = resolve(process.cwd(), tag, patch.folder);
-      const newLocation = resolve(process.cwd(), tag);
+      child.on('close', () => {
+        ++patchesDone;
 
-      var t = Date.now()
-      log("INFO", `Merging \`${patch.targetName}\` with \`${Object.entries(targets)[0][0]}\`...`)
-
-      merge(patchLocation, newLocation, 'overwrite')
-
-      // merge(patchLocation, newLocation).then(r => {
-      //   log("SUCCESS", `Merged \`${patch.targetName}\` with \`${Object.entries(targets)[0][0]}\` in \`${fancyTime(Date.now() - t)}s\`.`, true, false)
-      // }).catch(e => {
-      //   log("ERROR", `Failed merging \`${patch.targetName}\` with \`${Object.entries(targets)[0][0]}\`: ${e}`)
-      // })
+        if(patches.length == patchesDone) wrapUp();
+      })
     }
 
-    await sleep(2500);
+    const wrapUp = async () => {
+      await sleep(2500);
 
-    console.log(chalk.strikethrough("\n―――――――――――――――――――――――――――――――――――――――――――――――――――――――――\n"))
-    log("SUCCESS", `🎉 You are now ready to build ${chalk.bold("⭘  Dot Browser")}!`)
-    console.log()
-    log("INFO", `Total time took: ${chalk.bold(fancyTime(Date.now() - t))}.`)
-    log("INFO", `Targets cloned: ${chalk.bold(Object.entries(targets).length)}.`)
-    console.log(chalk.strikethrough("\n―――――――――――――――――――――――――――――――――――――――――――――――――――――――――\n"))
-
-    process.exit(0);
+      console.log(chalk.strikethrough("\n―――――――――――――――――――――――――――――――――――――――――――――――――――――――――\n"))
+      log("SUCCESS", `🎉 You are now ready to build ${chalk.bold("⭘  Dot Browser")}!`)
+      console.log()
+      log("INFO", `Total time took: ${chalk.bold(fancyTime(Date.now() - t))}.`)
+      log("INFO", `Targets cloned: ${chalk.bold(Object.entries(targets).length)}.`)
+      console.log(chalk.strikethrough("\n―――――――――――――――――――――――――――――――――――――――――――――――――――――――――\n"))
+  
+      process.exit(0);
+    }
 }
 
 module.exports = { preGet }
