@@ -15,17 +15,17 @@ yarn global add @dothq/build
 
 ### Usage
 
-### Help
+#### Help
 ```bash
 dot help
 ```
 
-### Downloading and running a build script
+#### Downloading and running a build script
 ```bash
 dot get <manifest-name>
 ```
 
-### Seeing all available build scripts
+#### Seeing all available build scripts
 ```bash
 dot tags
 ```
