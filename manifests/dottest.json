@@ -3,7 +3,7 @@
     "author": "Dot HQ",
     "id": "co.dothq.browsertest",
     "builder": "mach",
-    "requires": ["hg", "git"],
+    "requires": ["hg", "git", "nonexistantpackage"],
     "targets": {
         "base": {
             "tag": ["venkman"],
