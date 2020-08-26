@@ -4,9 +4,15 @@ const { program } = require('commander');
 const axios = require('axios');
 
 const { get } = require('../commands/get');
+const { update } = require('../commands/update');
+
 const { log } = require("../actions/console");
 
-program.version('1.0.0');
+const chalk = require("chalk");
+const fs = require("fs");
+const { resolve } = require("path");
+
+program.version(require("../package.json").version);
 
 program
 	.command('get <tag> [manifestOverride]')
@@ -14,9 +20,17 @@ program
 	.action(async (tag, manifestOverride) => get(tag, manifestOverride));
 
 program
+	.command('update')
+	.description('clear the manifests cache if they are misbehaving')
+	.action(async () => update());
+
+program
 	.command('tags [manifestOverride]')
 	.description('lists all tags')
 	.action((manifestOverride) => {
+		const home = require('os').homedir();
+		const cache = resolve(home, ".cache");
+
 		var t = Date.now();
 
 		log("INFO", `Fetching manifests from \`https://api.github.com/repos/${manifestOverride ? manifestOverride : "dothq/dot"}/contents/manifests\`...`, true)
@@ -28,7 +42,13 @@ program
 				console.log("\n\n  Available manifests")
 
 				res.data.forEach(manifest => {
-					console.log(`   - ${manifest.name.split(".")[0]}`)
+					let cachedIndicator = "";
+
+					const tag = manifest.name.split(".")[0];
+
+					if(fs.existsSync(resolve(cache, "dot")) && fs.existsSync(resolve(cache, "dot", tag))) cachedIndicator = "cached"
+
+					console.log(`   - ${tag} ${chalk.gray(cachedIndicator)}`)
 				})
 
 				console.log("")

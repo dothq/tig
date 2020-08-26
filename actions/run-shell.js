@@ -8,7 +8,8 @@ const runShell = (cmd) => {
             console.log(`Error when running \`${cmd}\`: Try running \`dot\` as root or as Administrator.`)
             return process.exit(-1);
           }
-          console.error(error);
+
+          reject(error);
         }
   
         resolve(stdout ? stdout : stderr);

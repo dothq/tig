@@ -6,19 +6,19 @@ const rlInterface = readline.createInterface({
   output: process.stdout
 });
 
-const log = (chan, pl, upPrev, nl) => {
+const log = (chan, pl, upPrev, nl, to) => {
     const channels = {
         ERROR: chalk.red.bold,
         WARN: chalk.yellow.bold,
         INFO: chalk.blue.bold,
         SUCCESS: chalk.green.bold,
         PROCESS: chalk.magenta.bold,
-        HELPER: chalk.cyan.bold
+        NATIVE: chalk.cyan.bold,
     }
   
     if(upPrev) {
       process.stdout.clearLine();
-      process.stdout.cursorTo(0);
+      process.stdout.cursorTo(to ? to : 0);
       process.stdout.write(`${channels[chan](chan)} ` + pl);
     } else {
       console.log(`${nl ? "\n" : ""}${channels[chan](chan)}`, pl) 

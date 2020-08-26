@@ -13,14 +13,8 @@ const { downloadGit } = require('../actions/download-git');
 const get = async (tag, manifestOverride) => {
     const home = require('os').homedir();
     const cache = resolve(home, ".cache");
-
-    const hgExists = await commandExists("hg");
-    const gitExists = await commandExists("git");
-
+    
     try { fs.mkdirSync(resolve(cache, "dot", "mercurial-downloads")) } catch(e) {}
-
-    if(!hgExists) return await downloadMercurial();
-    if(!gitExists) return await downloadGit();
 
     try { fs.mkdirSync(resolve(cache)) } catch(e) {}
     try { fs.mkdirSync(resolve(cache, "dot")) } catch(e) {}
