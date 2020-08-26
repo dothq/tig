@@ -6,7 +6,7 @@ const { log } = require("./console");
 
 const downloadManifest = (repo, name) => {
     return new Promise((resolve, reject) => {
-      axios.get(`https://raw.githubusercontent.com/${repo ? repo : "dothq/dot"}/master/manifests/${name}.json`)
+      axios.get(`https://raw.githubusercontent.com/${repo ? repo : "dothq/dot"}/master/manifests/${name}.json?t=${Date.now()}`)
         .then(res => resolve(res.data))
     })
 }

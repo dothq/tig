@@ -19,11 +19,11 @@ const runCppHook = async (target, targetName, location) => {
     console.log();
     log("INFO", `Cloning \`${targetName} (${target.name})\`, this may take a while...`)
 
-    await cppSleep();
+    await cppSleep().catch(e => e);
 
     var t = Date.now();
 
-    return new Promise(async (fullfill) => {
+    return new Promise(async (fullfill, reject) => {
         const { type, name, http, repository } = target;
 
         const runner = type == "mercurial" ? "hg" : type;

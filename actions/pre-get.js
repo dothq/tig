@@ -15,6 +15,8 @@ const sleep = () => {
   });
 }
 const preGet = async (tag, manifestOverride) => {
+    var t = Date.now();
+
     const { name, id, author, targets, builder, requires } = await grabManifest(tag, manifestOverride);
 
     if(!name || !id || !author || !builder || !targets || !targets.base || !targets.patch || !requires) { 
@@ -62,7 +64,10 @@ const preGet = async (tag, manifestOverride) => {
     await sleep(2500);
 
     console.log(chalk.strikethrough("\n―――――――――――――――――――――――――――――――――――――――――――――――――――――――――\n"))
-    log("SUCCESS", `You are now ready to build Dot Browser!`)
+    log("SUCCESS", `You are now ready to build ${chalk.bold("Dot Browser")}!`)
+    console.log()
+    log("INFO", `Total time took: ${chalk.bold(fancyTime(Date.now() - t))}.`)
+    log("INFO", `Targets cloned: ${chalk.bold(Object.entries(targets).length)}.`)
     console.log(chalk.strikethrough("\n―――――――――――――――――――――――――――――――――――――――――――――――――――――――――\n"))
 
     process.exit(0);

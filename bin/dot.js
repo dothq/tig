@@ -14,6 +14,11 @@ const { resolve } = require("path");
 
 program.version(require("../package.json").version);
 
+process.on('unhandledRejection', (reason, p) => {
+	// i'm lazy
+	return;
+});
+
 program
 	.command('get <tag> [manifestOverride]')
 	.description('get a project by its tag name')
