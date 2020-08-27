@@ -15,10 +15,10 @@ const { resolve } = require("path");
 
 program.version(require("../package.json").version);
 
-process.on('unhandledRejection', (reason, p) => {
-	// i'm lazy
-	return;
-});
+// process.on('unhandledRejection', (reason, p) => {
+// 	// i'm lazy
+// 	return;
+// });
 
 program
 	.command('get <tag> [manifestOverride]')

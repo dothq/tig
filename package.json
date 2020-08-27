@@ -1,6 +1,6 @@
 {
   "name": "@dothq/build",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Builder",
   "main": "bin/dot.js",
   "repository": "https://github.com/dothq/dot.git",
@@ -22,6 +22,7 @@
     "execa": "^4.0.3",
     "fs-extra": "^9.0.1",
     "get-stream": "^6.0.0",
+    "glob": "^7.1.6",
     "hg": "^0.3.3",
     "isomorphic-git": "^1.7.4",
     "merge-dirs": "^0.2.1",
